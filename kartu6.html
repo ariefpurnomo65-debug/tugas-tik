@@ -50,6 +50,7 @@ textarea{min-height:80px;resize:vertical}
 <label for="kelas">Pilih kelas Anda</label>
 <select id="kelas"><option value="">— pilih kelas —</option><option>XI-1</option><option>XI-3</option></select>
 </div>
+<p id="catatan-kunci" class="hint" style="display:none">Kelas sudah dikunci di perangkat ini. Hubungi guru jika perlu mengubah.</p>
 <div id="daftar"><p class="hint">Pilih kelas untuk menampilkan daftar anggota kelompok.</p></div>
 </section>
 
@@ -101,16 +102,13 @@ textarea{min-height:80px;resize:vertical}
 <script>
 const dataKelompok = {"XI-1": [["Abdul Dzaky", "Rian Aditya Pratama Situmorang", "Rizal Tritajuddin Rafif", "Nurfadila", "nurul aulia"], ["Wicaksono Purnama", "Maulana Febrian", "Alip Nasir", "Nuur Alfiyah", "NUR AINI"], ["Ahmad Zacky", "Charlys Dacosta Masau Ponto", "Nurpauzsia", "Aurelyn Claris Fransisca"], ["Belmenson Pere Bala Tadur", "Muhammad Sofian", "Nurul Askarizah", "kasih pertiwi"], ["Muhammad Ghifari Al Faruq", "Faisal", "Rohmah Wijayanti", "Hafizah Adha"], ["Andika Pratama", "hiskia", "Yuanita Mappa", "Pinkan Vanesa Febrilliant", "Winda Kirana"], ["Rahman", "Safryadi", "Apriani Sombokayang", "Andi Dinda Cintyawati", "Adinda Sarah"], ["Muhammad Syah Iskandar", "Romario Pongratte", "Nur Faizah", "Serli Marsa", "Siti Azzarah Firda"]], "XI-3": [["Revi Erlangga", "Muhammad Hairul", "Muhammad Fitra", "Adila Jibran", "Dita Amira Ilhami"], ["Telta Narya Reza Muzakkar", "Aldi", "Muhammad Raditya Pratama", "Nurmayanti", "Andi Dhian Vahira"], ["Amos Alexander Sitanggang", "Firhansyah", "Adly Malik Maulana", "Zakira Faradillah", "Anggraini Mangopo"], ["Hendrig Ardian Saputra Subowo", "Alvares Rohy Wolo", "Muhammad Ibrahimovic", "Frida Agustina Sabariah", "Nurul Asmawati"], ["Tengku Muhammad Hasan", "Rasya Al Fadillah", "Fitri Oktianawati", "Amalia Ramadhani"], ["Muhammad Budi Wijaya", "Taufik Ibrahim", "Asniati Zhakyla", "Risma"], ["Haerul", "Andika Prastyo Sunusmo", "Gita Taruli Septiani Sitanggang", "Zaskiya Tunnikmah", "Maria Aurelia Perita Koma"], ["Novian Marcel Aulia", "Gerin Migel Rampak", "Rachel Familya Permai", "Nabila Airin Nida", "Rani Safitri"]]};
 const nomorKartu = 6;
+const kunciKey = 'lkpd-kelas-kartu-' + nomorKartu;
 const kelas = document.getElementById('kelas');
 const daftar = document.getElementById('daftar');
+const catatan = document.getElementById('catatan-kunci');
 
-kelas.addEventListener('change', () => {
-  const k = kelas.value;
+function tampil(k){
   daftar.innerHTML = '';
-  if(!k){
-    daftar.innerHTML = '<p class="hint">Pilih kelas untuk menampilkan daftar anggota kelompok.</p>';
-    return;
-  }
   const anggota = dataKelompok[k][nomorKartu - 1];
   const info = document.createElement('p');
   info.className = 'hint';
@@ -128,6 +126,29 @@ kelas.addEventListener('change', () => {
   });
   box.appendChild(ul);
   daftar.appendChild(box);
+}
+
+function kunci(k){
+  kelas.value = k;
+  kelas.disabled = true;
+  catatan.style.display = 'block';
+  tampil(k);
+}
+
+let tersimpan = null;
+try { tersimpan = localStorage.getItem(kunciKey); } catch(e) {}
+if (tersimpan && dataKelompok[tersimpan]) {
+  kunci(tersimpan);
+}
+
+kelas.addEventListener('change', () => {
+  const k = kelas.value;
+  if(!k){
+    daftar.innerHTML = '<p class="hint">Pilih kelas untuk menampilkan daftar anggota kelompok.</p>';
+    return;
+  }
+  try { localStorage.setItem(kunciKey, k); } catch(e) {}
+  kunci(k);
 });
 </script>
 </body>
